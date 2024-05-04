@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  events-api:
+    container_name: events_api
+    build:
+      context: .
+      dockerfile: ./events-api/Dockerfile
+    ports: 
+      - "5000:8000"
+    environment:
+      DEPLOYMENT_ENV: 'dev'
+
+  openapi_mock:
+    container_name: openapi_mock
+    image: muonsoft/openapi-mock
+    volumes:
+    - ./3rd-party-api:/etc/openapi
+    environment:
+      OPENAPI_MOCK_SPECIFICATION_URL: '/etc/openapi/openapi.yaml'
+      OPENAPI_MOCK_USE_EXAMPLES: 'if_present'
+    ports:
+      - "9000:8080"
