@@ -25,7 +25,7 @@ class EventsService:
                 "until": str(events_request.endDate)
             }
             api_key = self._config.api_key
-            headers = {"X-API-Key": api_key}
+            headers = {"X-API-Key": api_key.get_secret_value()}
             url = "{url}/{league}{endpoint}".format(
                 url=self._config.third_party_url,
                 league=events_request.league,
