@@ -1,6 +1,7 @@
 import httpx
 
-from app.schemas.eventsResponse import Event
+from app.schemas.events_request import EventsRequest
+from app.schemas.events_response import Event
 from app.schemas.scoreboard import ScoreboardItem, Scoreboard
 from app.schemas.team_rankings import TeamRanking, TeamRankings
 from app.utils.logs import logger
@@ -11,31 +12,24 @@ class EventsService:
     Service class for handling requests to the 3rd party API
     """
     def __init__(self, client_config):
-        _config = client_config
+        self._config = client_config
         self._client = httpx.AsyncClient()
 
-    async def __get_scoreboard(self) -> ScoreboardItem:
+    async def get_events(self, events_request: EventsRequest):
         async with self._client:
-            resp = await self._client.get("http://localhost:9000/NFL/scoreboard")
-            logger.debug("Got a scoreboard response")
-            scoreboard = resp.json()
-        return scoreboard
-
-    async def __get_team_ranlings(self) -> TeamRankings:
-        async with self._client:
-            resp = await self._client.get("")
-            logger.debug("Got a team rankings response")
-            team_rankings = resp.json()
-        return team_rankings
-
-    async def get_events(self):
-        async with self._client:
-            scoreboard_resp = await self._client.get("http://localhost:9000/NFL/scoreboard")
+            date_filter = {
+                "since": events_request.startDate,
+                "until": events_request.endDate
+            }
+            headers = {"X-API-Key": "MY-VERY-SECRET-API-KEY"}
+            url = "http://localhost:9000/{league}/scoreboard".format(league=events_request.league)
+            scoreboard_resp = await self._client.get(url=url, params=date_filter, headers=headers)
             logger.debug("Got a scoreboard response")
             logger.debug(scoreboard_resp)
             scoreboard = Scoreboard(scoreboard_resp.json())
 
-            team_rankings_response = await self._client.get("http://localhost:9000/NFL/team-rankings")
+            url = "http://localhost:9000/{league}/team-rankings".format(league=events_request.league)
+            team_rankings_response = await self._client.get(url)
             logger.debug("Got a team rankings response")
             logger.debug(team_rankings_response)
             team_rankings = TeamRankings(team_rankings_response.json())

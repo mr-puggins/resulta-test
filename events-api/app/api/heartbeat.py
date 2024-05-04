@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from starlette.requests import Request
 
-from app.schemas.heartbeatResponse import HeartbeatResponse
+from app.schemas.heartbeat_response import HeartbeatResponse
 from app.utils.logs import logger
 
 router = APIRouter(prefix="/heartbeat")

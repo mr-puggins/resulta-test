@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.cors import CORSMiddleware
+from prometheus_client import make_asgi_app
 import sys
 
 # import custom modules
@@ -30,6 +31,9 @@ app.add_middleware(
     ],
 )
 
+# Add prometheus asgi middleware to route /metrics requests
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
 
 # add routers
 app.include_router(heartbeat_router)
