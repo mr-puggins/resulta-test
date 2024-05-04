@@ -1,8 +1,13 @@
+from typing import ForwardRef
+
 from pydantic import BaseModel
 
 
-class Error(BaseModel):
+APIError = ForwardRef('APIError')
+
+
+class APIError(BaseModel):
     title: str
     status: int
-    detail: str | None
-    cause: dict | {}
+    detail: str | None = None
+    cause: APIError | None = None

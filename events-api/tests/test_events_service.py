@@ -76,3 +76,23 @@ async def test_can_get_event(events_service, mocker):
         mocker.call(url='http://localhost:9000/NFL/team-rankings')
     ]
     mock_get.assert_has_calls(expected_calls)
+
+
+@pytest.mark.asyncio
+async def test_can_process_error(events_service, mocker):
+    mock_get = mocker.patch('httpx.AsyncClient.get', return_value=httpx.Response(404, json={
+        "title": "Goofed up",
+        "status": 400,
+        "detail": "My hovercraft is full of eels",
+        "cause": None
+    }))
+    event_request = EventsRequest(
+        league='NFL', startDate=None, endDate=None
+    )
+    with pytest.raises(Exception) as api_error_info:
+        await events_service.get_events(event_request)
+    assert api_error_info.typename == 'APIException'
+    assert api_error_info.value.error.status == 400
+    assert api_error_info.value.error.title == "Goofed up"
+    assert api_error_info.value.error.detail == "My hovercraft is full of eels"
+

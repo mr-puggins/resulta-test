@@ -1,9 +1,11 @@
 import httpx
 
+from app.schemas.error import APIError
 from app.schemas.events_request import EventsRequest
 from app.schemas.events_response import Event
 from app.schemas.scoreboard import ScoreboardItem, Scoreboard
 from app.schemas.team_rankings import TeamRanking, TeamRankings
+from app.utils.exceptions.api_exception import APIException
 from app.utils.logs import logger
 
 
@@ -26,13 +28,19 @@ class EventsService:
             scoreboard_resp = await self._client.get(url=url, params=date_filter, headers=headers)
             logger.debug("Got a scoreboard response")
             logger.debug(scoreboard_resp)
+
+            await self.__process_response(scoreboard_resp)
+
             scoreboard = Scoreboard(scoreboard_resp.json())
 
             url = "http://localhost:9000/{league}/team-rankings".format(league=events_request.league)
-            team_rankings_response = await self._client.get(url=url)
+            team_rankings_resp = await self._client.get(url=url)
             logger.debug("Got a team rankings response")
-            logger.debug(team_rankings_response)
-            team_rankings = TeamRankings(team_rankings_response.json())
+            logger.debug(team_rankings_resp)
+
+            await self.__process_response(team_rankings_resp)
+
+            team_rankings = TeamRankings(team_rankings_resp.json())
 
             events = []
 
@@ -41,6 +49,24 @@ class EventsService:
                 events.append(event)
 
         return events
+
+    async def __process_response(self, resp):
+        # It is not clear what error code will be returned by requesting a wrong league,
+        # so let's assume it's 404, even though it is not explicitly documented.
+        # Another assumption is that the default/unexpected error from the spec is 500,
+        # because it is most likely the only error the server could have thrown in a
+        # managed fashion.
+        match resp.status_code:
+            case 200:
+                logger.debug("And it's not an error \\o/")
+            case 400 | 401 | 403 | 404 | 500:
+                logger.debug("And it was an error :(")
+                error = APIError(**resp.json())
+                raise APIException(message=error.title, error=error)
+            case _:
+                logger.debug("Expected a response, but got a surprise")
+                raise APIException(message="Unexpected error",
+                                   error=APIError(title="Unexpected error", status=resp.status_code))
 
     async def __build_event(self, scoreboard_item, team_rankings):
         home_team_info = scoreboard_item.home

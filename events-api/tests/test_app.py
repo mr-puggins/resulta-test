@@ -10,3 +10,6 @@ async def test_read_heartbeat(fastapi_client: AsyncClient) -> None:
     response.json()
     # assert data["version"] == version
     assert response.status_code == status.HTTP_200_OK
+
+    assert response.json()['version'] == '0.0.1'
+    assert response.json()['description'] == 'Events API'
