@@ -1,0 +1,6 @@
+3rd_party_api:
+    url: "https://api.teams.com/v1"
+    scoreboard_endpoint: "/scoreboard"
+    team_rankings_endpoint: "/team-rankings"
+
+    api_key_var_name: "MY-EVEN-MORE-SECRET-API-KEY"

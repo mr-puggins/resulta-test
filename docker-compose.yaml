@@ -7,9 +7,13 @@ services:
       context: .
       dockerfile: ./events-api/Dockerfile
     ports: 
-      - "5000:8000"
+      - "8000:8000"
     environment:
       DEPLOYMENT_ENV: 'dev'
+      API_KEY: 'SOME-RANDOM-KEY' # this should be injected at deployment in prod
+      THIRD_PARTY_URL: 'http://localhost:9000'
+      SCOREBOARD_ENDPOINT: 'scoreboard'
+      TEAM_RANKINGS_ENDPOINT: 'team-rankings'
 
   openapi_mock:
     container_name: openapi_mock

@@ -5,6 +5,7 @@ from app.schemas.events_request import EventsRequest
 from app.schemas.events_response import Event
 from app.schemas.scoreboard import ScoreboardItem, Scoreboard
 from app.schemas.team_rankings import TeamRanking, TeamRankings
+from app.settings import AppSettings
 from app.utils.exceptions.api_exception import APIException
 from app.utils.logs import logger
 
@@ -13,8 +14,8 @@ class EventsService:
     """
     Service class for handling requests to the 3rd party API
     """
-    def __init__(self, client_config):
-        self._config = client_config
+    def __init__(self, settings: AppSettings):
+        self._config = settings
         self._client = httpx.AsyncClient()
 
     async def get_events(self, events_request: EventsRequest) -> list[Event]:
@@ -23,8 +24,13 @@ class EventsService:
                 "since": str(events_request.startDate),
                 "until": str(events_request.endDate)
             }
-            headers = {"X-API-Key": "MY-VERY-SECRET-API-KEY"}
-            url = "http://localhost:9000/{league}/scoreboard".format(league=events_request.league)
+            api_key = self._config.api_key
+            headers = {"X-API-Key": api_key}
+            url = "{url}/{league}{endpoint}".format(
+                url=self._config.third_party_url,
+                league=events_request.league,
+                endpoint=self._config.scoreboard_endpoint
+            )
             scoreboard_resp = await self._client.get(url=url, params=date_filter, headers=headers)
             logger.debug("Got a scoreboard response")
             logger.debug(scoreboard_resp)
@@ -33,8 +39,12 @@ class EventsService:
 
             scoreboard = Scoreboard(scoreboard_resp.json())
 
-            url = "http://localhost:9000/{league}/team-rankings".format(league=events_request.league)
-            team_rankings_resp = await self._client.get(url=url)
+            url = "{url}/{league}{endpoint}".format(
+                url=self._config.third_party_url,
+                league=events_request.league,
+                endpoint=self._config.team_rankings_endpoint
+            )
+            team_rankings_resp = await self._client.get(url=url, headers=headers)
             logger.debug("Got a team rankings response")
             logger.debug(team_rankings_resp)
 

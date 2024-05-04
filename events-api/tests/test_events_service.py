@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 import httpx
 import pytest
 from pytest_mock import mocker
@@ -6,11 +8,12 @@ from app.schemas.events_request import EventsRequest
 from app.schemas.scoreboard import ScoreboardItem
 from app.schemas.team_rankings import TeamRankings
 from app.service.events_service import EventsService
+from tests.test_settings import test_settings
 
 
 @pytest.fixture()
 def events_service():
-    return EventsService(...)
+    return EventsService(test_settings)
 
 
 @pytest.mark.asyncio
@@ -71,9 +74,10 @@ async def test_can_get_event(events_service, mocker):
         mocker.call(
             url='http://localhost:9000/NFL/scoreboard',
             params={'since': '2024-01-01', 'until': '2024-05-04'},
-            headers={'X-API-Key': 'MY-VERY-SECRET-API-KEY'}
+            headers={'X-API-Key': ANY}
         ),
-        mocker.call(url='http://localhost:9000/NFL/team-rankings')
+        mocker.call(url='http://localhost:9000/NFL/team-rankings',
+                    headers={'X-API-Key': ANY})
     ]
     mock_get.assert_has_calls(expected_calls)
 
