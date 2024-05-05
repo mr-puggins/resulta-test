@@ -74,10 +74,10 @@ async def test_can_get_event(events_service, mocker):
         mocker.call(
             url='http://localhost:9000/NFL/scoreboard',
             params={'since': '2024-01-01', 'until': '2024-05-04'},
-            headers={'X-API-Key': ANY}
+            headers={'X-API-Key': ANY, 'X-Request-ID': None}
         ),
         mocker.call(url='http://localhost:9000/NFL/team-rankings',
-                    headers={'X-API-Key': ANY})
+                    headers={'X-API-Key': ANY, 'X-Request-ID': None})
     ]
     mock_get.assert_has_calls(expected_calls)
 

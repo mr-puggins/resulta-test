@@ -19,7 +19,7 @@ class EventsService:
     def __init__(self, settings: AppSettings):
         self._config = settings
 
-    async def get_events(self, request: Request, events_request: EventsRequest) -> list[Event]:
+    async def get_events(self, events_request: EventsRequest) -> list[Event]:
         async with httpx.AsyncClient() as client:
             date_filter = {
                 "since": str(events_request.startDate),
