@@ -1,6 +1,0 @@
-3rd_party_api:
-    url: "http://localhost:9000"
-    scoreboard_endpoint: "/scoreboard"
-    team_rankings_endpoint: "/team-rankings"
-
-    api_key_var_name: "MY-VERY-SECRET-API-KEY"

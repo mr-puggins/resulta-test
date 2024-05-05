@@ -7,7 +7,7 @@ from app.schemas.scoreboard import ScoreboardItem, Scoreboard
 from app.schemas.team_rankings import TeamRanking, TeamRankings
 from app.settings import AppSettings
 from app.utils.exceptions.api_exception import APIException
-from app.utils.logs import logger
+from app.depends import logger
 
 
 class EventsService:

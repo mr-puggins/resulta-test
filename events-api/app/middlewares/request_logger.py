@@ -5,8 +5,7 @@ from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-# custom modules
-from app.utils.logs import logger
+from app.depends import logger
 
 
 class RequestLogger(BaseHTTPMiddleware):

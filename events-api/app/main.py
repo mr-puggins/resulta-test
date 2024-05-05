@@ -11,9 +11,8 @@ from starlette.responses import JSONResponse
 from app.schemas.error import APIError
 from app.settings import AppSettings
 from app.utils.exceptions.api_exception import APIException
-# import custom modules
-# from MovieAPI.api import actors, movies, subscriptions, token, users
-from app.utils.logs import logger
+
+from app.depends import logger
 from app.middlewares import RequestID, RequestLogger
 from app.api import heartbeat_router, events_router
 

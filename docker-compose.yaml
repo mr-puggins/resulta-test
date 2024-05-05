@@ -10,6 +10,7 @@ services:
       - "8000:8000"
     environment:
       DEPLOYMENT_ENV: 'dev'
+      LOG_LEVEL: 'DEBUG'
       API_KEY: 'SOME-RANDOM-KEY' # this should be injected at deployment in prod
       THIRD_PARTY_URL: 'http://localhost:9000'
       SCOREBOARD_ENDPOINT: 'scoreboard'
