@@ -62,6 +62,36 @@ async def test_can_build_event(events_service):
     assert event.awayTeamRank == 1
     assert event.awayTeamRankPoints == 100.3
 
+@pytest.mark.asyncio
+async def test_build_event_no_team(events_service):
+    rankings = [{
+        "teamId": "925d8698-fc1e-4a4a-b3d7-c6f64ff2d0ff",
+        "rank": 1,
+        "rankPoints": 100.3
+    },
+        {
+            "teamId": "85ac784e-0743-4531-9317-b87fd6b02d02",
+            "rank": 3,
+            "rankPoints": 33.4
+        }]
+    scoreboard_item = {
+        "id": "5055c2a2-af68-4082-9834-ceb36dd0a807",
+        "timestamp": "2023-01-11T14:00:00Z",
+        "away": {
+            "id": "ae5132a4-e4b2-4bda-9933-b75c542b8d35",
+            "city": "Arizona",
+            "nickName": "Arizona Cardinals"
+        },
+        "home": {
+            "id": "8da0c96d-7b3d-41f3-9e68-29607f3babcf",
+            "city": "Atlanta",
+            "nickName": "Atlanta Falcons"
+        }
+    }
+    with pytest.raises(Exception) as attribute_error:
+        await events_service._EventsService__build_event(ScoreboardItem(**scoreboard_item), TeamRankings(rankings))
+    assert attribute_error.typename == 'AttributeError'
+
 
 @pytest.mark.asyncio
 async def test_can_get_event(events_service, mocker):

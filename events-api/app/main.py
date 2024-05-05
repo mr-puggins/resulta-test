@@ -56,7 +56,7 @@ app.include_router(events_router)
 
 # Add connection error handling
 @app.exception_handler(ConnectError)
-async def connection_error_exception_handler(request: Request, exc: ConnectError):
+async def connection_error_exception_handler(exc: ConnectError):
     logger.error(exc)
     return JSONResponse(
         status_code=503,
@@ -68,11 +68,21 @@ async def connection_error_exception_handler(request: Request, exc: ConnectError
 
 # Add custom exception to handle 3rd party errors
 @app.exception_handler(APIException)
-async def api_error_exception_handler(request: Request, exc: APIException):
+async def api_error_exception_handler(exc: APIException):
     logger.error(exc)
     return JSONResponse(
         status_code=503,
         content=exc.error.dict()
+    )
+
+
+# Add custom exception to handle 3rd party data errors
+@app.exception_handler(AttributeError)
+async def api_error_exception_handler(exc: AttributeError):
+    logger.error(exc)
+    return JSONResponse(
+        status_code=503,
+        content=format("Data integrity or dependency contract issue: {}", str(exc))
     )
 
 

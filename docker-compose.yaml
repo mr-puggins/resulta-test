@@ -3,18 +3,20 @@ version: '3.8'
 services:
   events-api:
     container_name: events_api
+    depends_on:
+      - openapi_mock
     build:
-      context: .
-      dockerfile: ./events-api/Dockerfile
+      context: ./events-api
+      dockerfile: Dockerfile
     ports: 
       - "8000:8000"
     environment:
       DEPLOYMENT_ENV: 'dev'
       LOG_LEVEL: 'DEBUG'
       API_KEY: 'SOME-RANDOM-KEY' # this should be injected at deployment in prod
-      THIRD_PARTY_URL: 'http://localhost:9000'
-      SCOREBOARD_ENDPOINT: 'scoreboard'
-      TEAM_RANKINGS_ENDPOINT: 'team-rankings'
+      THIRD_PARTY_URL: 'http://openapi_mock:8080'
+      SCOREBOARD_ENDPOINT: '/scoreboard'
+      TEAM_RANKINGS_ENDPOINT: '/team-rankings'
 
   openapi_mock:
     container_name: openapi_mock
