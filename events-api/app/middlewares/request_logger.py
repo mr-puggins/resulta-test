@@ -9,13 +9,6 @@ from app.depends import logger
 
 
 class RequestLogger(BaseHTTPMiddleware):
-    """
-    To log every request with custom logger.
-
-    Args:
-        app (fastapi.Request): Instance of a FastAPI class.
-    """
-
     def __init__(self, app) -> None:
         super().__init__(app)
 
@@ -33,11 +26,10 @@ class RequestLogger(BaseHTTPMiddleware):
             response = await call_next(request)
             end = time.time()
             logger.info(
-                f"method={request.method} | {request.url} | {request.state.request_id} | {response.status_code} | {end - start}s"
+                f"method={request.method} | {request.url} | {response.status_code} | {end - start}s"
             )
             return response
         except Exception as e:
-            logger.warning(
-                f"method={request.method} | {request.url} | {request.state.request_id} | {e}"
+            logger.error(
+                f"method={request.method} | {request.url} | {e}"
             )
-            return JSONResponse(status_code=500, content={"reason": str(e)})

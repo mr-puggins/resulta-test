@@ -9,12 +9,6 @@ from app.depends import logger
 
 
 class RequestID(BaseHTTPMiddleware):
-    """Add a uuid to the request header.
-
-    Args:
-        app (fastapi.Request): Instance of a FastAPI class.
-    """
-
     def __init__(self, app):
         super().__init__(app)
 

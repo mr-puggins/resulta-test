@@ -1,4 +1,6 @@
 import httpx
+from asgi_correlation_id import correlation_id
+from starlette.requests import Request
 
 from app.schemas.error import APIError
 from app.schemas.events_request import EventsRequest
@@ -16,22 +18,24 @@ class EventsService:
     """
     def __init__(self, settings: AppSettings):
         self._config = settings
-        self._client = httpx.AsyncClient()
 
-    async def get_events(self, events_request: EventsRequest) -> list[Event]:
-        async with self._client:
+    async def get_events(self, request: Request, events_request: EventsRequest) -> list[Event]:
+        async with httpx.AsyncClient() as client:
             date_filter = {
                 "since": str(events_request.startDate),
                 "until": str(events_request.endDate)
             }
             api_key = self._config.api_key
-            headers = {"X-API-Key": api_key.get_secret_value()}
+            headers = {
+                "X-API-Key": api_key.get_secret_value(),
+                "X-Request-ID": correlation_id.get()
+            }
             url = "{url}/{league}{endpoint}".format(
                 url=self._config.third_party_url,
                 league=events_request.league,
                 endpoint=self._config.scoreboard_endpoint
             )
-            scoreboard_resp = await self._client.get(url=url, params=date_filter, headers=headers)
+            scoreboard_resp = await client.get(url=url, params=date_filter, headers=headers)
             logger.debug("Got a scoreboard response")
             logger.debug(scoreboard_resp)
 
@@ -44,7 +48,7 @@ class EventsService:
                 league=events_request.league,
                 endpoint=self._config.team_rankings_endpoint
             )
-            team_rankings_resp = await self._client.get(url=url, headers=headers)
+            team_rankings_resp = await client.get(url=url, headers=headers)
             logger.debug("Got a team rankings response")
             logger.debug(team_rankings_resp)
 
