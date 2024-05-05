@@ -1,7 +1,7 @@
 # Resulta Technical Challenge
 This repository contains an implementation of Events API according to the **ACME Sports** specification and means to test it.
 ## Prerequisites
- - Docker
+ - Docker and Docker Compose
  - GNU make
  - Python 3.10+
  - Hurl - _optional_
@@ -12,6 +12,12 @@ From the root directory run:
  - `make up` to build and start the containers
  - `make test` Hurl tests specified in `events-api.hurl`
  - `make down` to stop the containers
+
+When the containers are up and running, the following endpoints are exposed:
+ - `http://localhost:8000/docs` - Events API documentation generated from its OpenAPI specification
+ - `http://localhost:8000/events` - the main endpoint that retrieves events
+ - `http://localhost:8000/heartbeat` - the heartbeat endpoint for monitoring purpose
+ - `http://localhost:8000/metrics` - this edpoint responds with some metrics for Prometheus
 ## What's inside
 `evens-api` is the home directory of the Events API implementation and has the following structure:
 ```md
@@ -48,6 +54,7 @@ events-api
 └── tests - automated tests
     ├── conftest.py - pytest fixture for integration tests
     ├── __init__.py
+    ├── requirements.txt - dependencies required to run tests
     ├── test_app.py - integration test example
     ├── test_events_service.py - service unit tests
     └── test_settings.py - a copy of settings file for test purposes
